@@ -25,9 +25,25 @@ keyboard4.row('самовывоз', 'доставка')
 keyboard5 = telebot.types.ReplyKeyboardMarkup(True, True)
 keyboard5.row('оформить заказ')
 
+@bot.message_handler(commands=['start'])
+def geo(message):
+	keyboard=types.ReplyKeyboardMarkup(row_width=1,resize_keyboard=True)
+	button_geo=types.KeyboardButton(text='Отправить местоположение', request_location=True)
+	keyboard.add(button_geo)
+	bot.send_message(message.chat.id, 'Привет! Нажми на кнопку и передай мне своё местоположение.', reply_markup=keyboard)
 
-
-@bot.message_handler(commands = ['start'])
+@bot.message_handler(content_types=['location'])
+def location(message):
+	if message.location is not None:
+		global geo_N
+		geo_N=message.location.latitude
+		global geo_W
+		geo_W=message.location.longitude
+	print (geo_W)
+	print(geo_N)
+	bot.send_message(message.chat.id, 'Спасибо! Можешь приступить к заказу нажав /order')
+		
+@bot.message_handler(commands = ['order'])
 def start_message(message):
 	bot.send_message(message.chat.id, "в какой тц пойдем?", reply_markup=keyboard1)
 
@@ -121,7 +137,7 @@ def send_text(message):
 		global req
 		req = str(random.randint(1, 1000)) + ' ' + message.from_user.first_name
 		rez += '    реквизиты: ' + req
-		bot.send_message(785534105, '{order}'.format(order=rez))
+		bot.send_message(785534105, '{order} {geon} {geow}'.format(order=rez, geon=geo_N,geow=geo_W))
 		bot.send_message(message.chat.id, ("ко скольки приготовить заказ?(стандартное время ожидания = 5 минут)"))
 		for i in kfc:
 			kfc[i] = 0
@@ -132,7 +148,7 @@ def send_text(message):
 		
 		if savior:
 			w = int(ans)
-			
+
 		else:
 			time_order = 'заказ по коду "' + req + '" должен быть готов к ' + ans
 			bot.send_message(785534105, '{order}'.format(order=time_order))            
