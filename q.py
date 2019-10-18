@@ -1,7 +1,7 @@
 import telebot
 from telebot import types
 import random
-
+import time
 bot = telebot.TeleBot("941558477:AAGShts4Z6AFqc1E5LEc3zxi5YdpzxJ4OKk")
 
 
@@ -32,15 +32,12 @@ def start_message(message):
 	bot.send_message(message.chat.id, "в какой тц пойдем?", reply_markup=keyboard1)
 
 
-@bot.message_handler(content_types=['text'])
-def food_amount(message):
-	bot.send_message(message.chat.id, "сколько еды?")
-	global amount 
-	amount = message.text
-
+@bot.message_handler(content_types = ['text'])
 def send_text(message):
 	ans = message.text.lower()
-
+	savior = True
+	global w
+	
 	
 	if ans == 'сильвермолл':
 		bot.send_message(message.chat.id, "в какой ресторан пойдем?", reply_markup=keyboard2)
@@ -51,41 +48,41 @@ def send_text(message):
 		arr[0] = ans
 
 	elif ans == 'кфс' or message.text.lower() == 'нет':
-		bot.send_photo(message.chat.id, open('Burger.jpg', 'rb'), reply_markup=keyboard3)
+		bot.send_photo(message.chat.id, open('Burger.jpg', 'rb'),'сколько штук?', reply_markup=keyboard3)
 		if arr[1] != 'кфс':
 			 arr[1] = ans
-			 a = 
 
-	elif ans == 'сабвей' or message.text.lower() == 'нет':
+	elif ans == 'сабвей' or message.text.lower() == 'нет':		
 		bot.send_photo(message.chat.id, open('subway.jpg', 'rb'), reply_markup=keyboard3s)
 		if arr[1] != 'сабвей':
 			arr[1] = ans
 
-	elif ans == 'такос':
-		food_amount()
-		bot.send_message(message.chat.id, "закончить покупки?", reply_markup=keyboardChoose)
+	elif ans == 'такос':	
+	
+		kfc['такос'] += w
 
-		kfc['такос'] += 1
+		bot.send_message(message.chat.id, "закончить покупки?", reply_markup=keyboardChoose)
+		
 
 	elif ans == 'твистер':
 		bot.send_message(message.chat.id, "закончить покупки?", reply_markup=keyboardChoose)       
-		kfc['твистер'] += 1
+		kfc['твистер'] += w
 
 	elif ans == 'чизбургер':
 		bot.send_message(message.chat.id, "закончить покупки?", reply_markup=keyboardChoose)
-		kfc['чизбургер'] += 1
+		kfc['чизбургер'] += w
 
 	elif ans == 'steak&cheese':
 		bot.send_message(message.chat.id, "закончить покупки?", reply_markup=keyboardChoose)
-		subway['steak&cheese'] += 1
+		subway['steak&cheese'] += w
 
 	elif ans == 'italian bmt':
 		bot.send_message(message.chat.id, "закончить покупки?", reply_markup=keyboardChoose)       
-		subway['italian bmt'] += 1
+		subway['italian bmt'] += w
 
 	elif ans == 'chiсkenteryaki':
 		bot.send_message(message.chat.id, "закончить покупки?", reply_markup=keyboardChoose)
-		subway['chiсkenteryaki'] += 1
+		subway['chiсkenteryaki'] += w
 
 	elif ans == 'да':
 		bot.send_message(message.chat.id, 'самовывоз или доставка?', reply_markup=keyboard4)
@@ -120,7 +117,7 @@ def send_text(message):
 
 			else:
 				rez += arr[i] + ' , '
-		
+		savior = False
 		global req
 		req = str(random.randint(1, 1000)) + ' ' + message.from_user.first_name
 		rez += '    реквизиты: ' + req
@@ -132,15 +129,15 @@ def send_text(message):
 			subway[i] = 0
 
 	elif ans[0] in '0123456789':
-		time_order = 'заказ по коду "' + req + '" должен быть готов к ' + ans
-		bot.send_message(785534105, '{order}'.format(order=time_order))             
+		
+		if savior:
+			w = int(ans)
+			
+		else:
+			time_order = 'заказ по коду "' + req + '" должен быть готов к ' + ans
+			bot.send_message(785534105, '{order}'.format(order=time_order))            
 
-	
-@bot.message_handler(content_types=['text'])
-def food_amount(message):
-	global w
-	tb.send_message(chat_id, "Сколько вы хотите заказать?")
-	w = message.text
+
 	
 
 	
