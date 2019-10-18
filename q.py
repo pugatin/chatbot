@@ -6,9 +6,9 @@ bot = telebot.TeleBot("941558477:AAGShts4Z6AFqc1E5LEc3zxi5YdpzxJ4OKk")
 
 
 kfc = {'такос':0, 'твистер':0, 'чизбургер':0}
-subway = {}
-arr = ['']*6
-count = [0]*2
+subway = {'Steak&Cheese':0, 'ChickenTeryaki':0,'Italian BMT':0,'Meatball':0, 'Turkey&Ham':0}
+arr = ['']*3
+
 
 keyboard1 = telebot.types.ReplyKeyboardMarkup(True)
 keyboard1.row('сильвермолл', 'новый')
@@ -49,6 +49,7 @@ def send_text(message):
 		bot.send_photo(message.chat.id, open('Burger.jpg', 'rb'), reply_markup=keyboard3)
 		if arr[1] != 'кфс':
 			 arr[1] = ans
+			 a = 
 
 	elif ans == 'сабвей' or message.text.lower() == 'нет':
 		bot.send_photo(message.chat.id, open('subway.jpg', 'rb'), reply_markup=keyboard3s)
@@ -61,68 +62,70 @@ def send_text(message):
 
 	elif ans == 'твистер':
 		bot.send_message(message.chat.id, "закончить покупки?", reply_markup=keyboardChoose)       
-		count[1] += 1
+		kfc['твистер'] += 1
 
 	elif ans == 'чизбургер':
 		bot.send_message(message.chat.id, "закончить покупки?", reply_markup=keyboardChoose)
-		count[1] += 1
+		kfc['чизбургер'] += 1
 
 	elif ans == 'steak&cheese':
 		bot.send_message(message.chat.id, "закончить покупки?", reply_markup=keyboardChoose)
-		arr[3] = 'steak&cheese'
-		count[1] += 1
+		subway['steak&cheese'] += 1
 
 	elif ans == 'italian bmt':
 		bot.send_message(message.chat.id, "закончить покупки?", reply_markup=keyboardChoose)       
-		count[1] += 1
+		subway['italian bmt'] += 1
 
 	elif ans == 'chiсkenteryaki':
 		bot.send_message(message.chat.id, "закончить покупки?", reply_markup=keyboardChoose)
-		arr[3] = 'chiсkenteryaki'
-		count[1] += 1
+		subway['chiсkenteryaki'] += 1
 
 	elif ans == 'да':
 		bot.send_message(message.chat.id, 'самовывоз или доставка?', reply_markup=keyboard4)
 
 	elif ans == 'самовывоз':
 		bot.send_message(message.chat.id, "оформить заказ?", reply_markup=keyboard5)
-		arr[4] = ans
+		arr[2] = ans
 
 	elif ans == 'доставка':
 		bot.send_message(message.chat.id, "оформить заказ?", reply_markup=keyboard5)
-		arr[4] = ans
+		arr[2] = ans
 
 	elif ans == 'оформить заказ':
-
-		
-		
 		rez = ''	
 		bot.send_message(message.chat.id, 'Твой заказ принят')
 		for i in range(len(arr)):
-			if i == 2 and count[0] != 0:
-				rez += str(count[0]) + ' - ' +  arr[2] + ' -> '
-				continue
-			elif i == 3 and count[1] != 0:
-				rez += str(count[1]) + ' - ' + arr[3] + ' -> '
-				continue
-			elif i == 4:
+			if i == 1:
+				if arr[i] == 'кфс':
+					rez += arr[i] + ' , '
+					for i in kfc:
+						if kfc[i] > 0:
+							rez += i + ' - ' + str(kfc[i]) + ' , '
+				elif arr[i] == 'сабвей':
+					rez += arr[i] + ' -> '
+					for i in subway:
+						if subway[i] > 0:
+							rez += i + ' - ' + str(subway[i]) + ' , '
+
+			elif i == 2:
 				rez += arr[i]
 				break
+
 			else:
-				rez += arr[i] + ' -> '
-		for i in kfc:
-				if kfc[i] > 0:
-					rez += i + ' - ' + str(kfc[i])
+				rez += arr[i] + ' , '
+		
 		global req
 		req = str(random.randint(1, 1000)) + ' ' + message.from_user.first_name
 		rez += '    реквизиты: ' + req
 		bot.send_message(785534105, '{order}'.format(order=rez))
-		bot.send_message(message.chat.id, ("ко скольки приготовить заказ. (стандартное время ожидания = 5 минут)"))
-		for i in count:
-			i = 0
+		bot.send_message(message.chat.id, ("ко скольки приготовить заказ?(стандартное время ожидания = 5 минут)"))
+		for i in kfc:
+			kfc[i] = 0
+		for i in subway:
+			subway[i] = 0
 
 	elif ans[0] in '0123456789':
-		time_order = 'заказ по коду ' + req + ' должен быть готов к ' + ans
+		time_order = 'заказ по коду "' + req + '" должен быть готов к ' + ans
 		bot.send_message(785534105, '{order}'.format(order=time_order))             
 
 	
