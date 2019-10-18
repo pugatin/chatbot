@@ -33,6 +33,11 @@ def start_message(message):
 
 
 @bot.message_handler(content_types=['text'])
+def food_amount(message):
+	bot.send_message(message.chat.id, "сколько еды?")
+	global amount 
+	amount = message.text
+
 def send_text(message):
 	ans = message.text.lower()
 
@@ -57,7 +62,9 @@ def send_text(message):
 			arr[1] = ans
 
 	elif ans == 'такос':
-		bot.send_message(message.chat.id, "закончить покупки?", reply_markup=keyboardChoose)     
+		food_amount()
+		bot.send_message(message.chat.id, "закончить покупки?", reply_markup=keyboardChoose)
+
 		kfc['такос'] += 1
 
 	elif ans == 'твистер':
@@ -129,7 +136,12 @@ def send_text(message):
 		bot.send_message(785534105, '{order}'.format(order=time_order))             
 
 	
-
+@bot.message_handler(content_types=['text'])
+def food_amount(message):
+	global w
+	tb.send_message(chat_id, "Сколько вы хотите заказать?")
+	w = message.text
+	
 
 	
 
