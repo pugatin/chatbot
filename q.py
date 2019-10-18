@@ -25,25 +25,8 @@ keyboard4.row('самовывоз', 'доставка')
 keyboard5 = telebot.types.ReplyKeyboardMarkup(True, True)
 keyboard5.row('оформить заказ')
 
-@bot.message_handler(commands=['start'])
-def geo(message):
-	keyboard=types.ReplyKeyboardMarkup(row_width=1,resize_keyboard=True)
-	button_geo=types.KeyboardButton(text='Отправить местоположение', request_location=True)
-	keyboard.add(button_geo)
-	bot.send_message(message.chat.id, 'Привет! Нажми на кнопку и передай мне своё местоположение.', reply_markup=keyboard)
 
-@bot.message_handler(content_types=['location'])
-def location(message):
-	if message.location is not None:
-		global geo_N
-		geo_N=message.location.latitude
-		global geo_W
-		geo_W=message.location.longitude
-	print (geo_W)
-	print(geo_N)
-	bot.send_message(message.chat.id, 'Спасибо! Можешь приступить к заказу нажав /order')
-		
-@bot.message_handler(commands = ['order'])
+@bot.message_handler(commands = ['start'])
 def start_message(message):
 	bot.send_message(message.chat.id, "в какой тц пойдем?", reply_markup=keyboard1)
 
@@ -51,8 +34,8 @@ def start_message(message):
 @bot.message_handler(content_types = ['text'])
 def send_text(message):
 	ans = message.text.lower()
-	savior = True
-	global w
+	
+	global amount
 	
 	
 	if ans == 'сильвермолл':
@@ -69,36 +52,36 @@ def send_text(message):
 			 arr[1] = ans
 
 	elif ans == 'сабвей' or message.text.lower() == 'нет':		
-		bot.send_photo(message.chat.id, open('subway.jpg', 'rb'), reply_markup=keyboard3s)
+		bot.send_photo(message.chat.id, open('subway.jpg', 'rb'),'сколько штук?', reply_markup=keyboard3s)
 		if arr[1] != 'сабвей':
 			arr[1] = ans
 
 	elif ans == 'такос':	
 	
-		kfc['такос'] += w
+		kfc[ans] += amount
 
 		bot.send_message(message.chat.id, "закончить покупки?", reply_markup=keyboardChoose)
 		
 
 	elif ans == 'твистер':
 		bot.send_message(message.chat.id, "закончить покупки?", reply_markup=keyboardChoose)       
-		kfc['твистер'] += w
+		kfc[ans] += amount
 
 	elif ans == 'чизбургер':
 		bot.send_message(message.chat.id, "закончить покупки?", reply_markup=keyboardChoose)
-		kfc['чизбургер'] += w
+		kfc[ans] += amount
 
 	elif ans == 'steak&cheese':
 		bot.send_message(message.chat.id, "закончить покупки?", reply_markup=keyboardChoose)
-		subway['steak&cheese'] += w
+		subway[ans] += amount
 
-	elif ans == 'italian bmt':
+	elif ans == 'italian bmt':  ,
 		bot.send_message(message.chat.id, "закончить покупки?", reply_markup=keyboardChoose)       
-		subway['italian bmt'] += w
+		subway[ans] += amount
 
 	elif ans == 'chiсkenteryaki':
 		bot.send_message(message.chat.id, "закончить покупки?", reply_markup=keyboardChoose)
-		subway['chiсkenteryaki'] += w
+		subway[ans] += amount
 
 	elif ans == 'да':
 		bot.send_message(message.chat.id, 'самовывоз или доставка?', reply_markup=keyboard4)
@@ -108,6 +91,19 @@ def send_text(message):
 		arr[2] = ans
 
 	elif ans == 'доставка':
+		keyboard=types.ReplyKeyboardMarkup(row_width=1,resize_keyboard=True)
+		button_geo=types.KeyboardButton(text='Отправить местоположение', request_location=True)
+		keyboard.add(button_geo)
+		bot.send_message(message.chat.id, 'Привет! Нажми на кнопку и передай мне своё местоположение.', reply_markup=keyboard)
+		if message.location is not None:
+			global geo_N
+			geo_N=message.location.latitude
+			global geo_W
+			geo_W=message.location.longitude
+			print (geo_W)
+			print(geo_N)
+			bot.send_message(message.chat.id, 'Спасибо! Можешь приступить к заказу нажав /order')
+
 		bot.send_message(message.chat.id, "оформить заказ?", reply_markup=keyboard5)
 		arr[2] = ans
 
@@ -137,7 +133,10 @@ def send_text(message):
 		global req
 		req = str(random.randint(1, 1000)) + ' ' + message.from_user.first_name
 		rez += '    реквизиты: ' + req
-		bot.send_message(785534105, '{order} {geon} {geow}'.format(order=rez, geon=geo_N,geow=geo_W))
+		
+		if arr[2] == 'доставка':
+			bot.send_message(785534105, '{geon} {geow}'.format(geon=geo_N,geow=geo_W))
+
 		bot.send_message(message.chat.id, ("ко скольки приготовить заказ?(стандартное время ожидания = 5 минут)"))
 		for i in kfc:
 			kfc[i] = 0
@@ -146,17 +145,34 @@ def send_text(message):
 
 	elif ans[0] in '0123456789':
 		
-		if savior:
-			w = int(ans)
+		if arr[2] == 'самовывоз':
+			time_order = 'заказ по коду "' + req + '" должен быть готов к ' + ans
+			bot.send_message(785534105, '{order}'.format(order=time_order)) 
 
 		else:
-			time_order = 'заказ по коду "' + req + '" должен быть готов к ' + ans
-			bot.send_message(785534105, '{order}'.format(order=time_order))            
-
+			amount = int(ans)
 
 	
+@bot.message_handler(content_types=['text'])
+def get_geo(message):
+	if message.text == 'доставка':
+		def geo(message):
+			keyboard=types.ReplyKeyboardMarkup(row_width=1,resize_keyboard=True)
+			button_geo=types.KeyboardButton(text='Отправить местоположение', request_location=True)
+			keyboard.add(button_geo)
+			bot.send_message(message.chat.id, 'Привет! Нажми на кнопку и передай мне своё местоположение.', reply_markup=keyboard)
 
-	
+@bot.message_handler(content_types=['location'])
+def location(message):
+	if message.location is not None:
+		global geo_N
+		geo_N=message.location.latitude
+		global geo_W
+		geo_W=message.location.longitude
+	print (geo_W)
+	print(geo_N)
+	bot.send_message(message.chat.id, 'Спасибо! Можешь приступить к заказу нажав /order')
+			
 
 bot.polling(none_stop = True)
 
